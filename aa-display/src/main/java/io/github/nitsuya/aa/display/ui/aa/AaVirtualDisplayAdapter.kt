@@ -139,7 +139,11 @@ class AaVirtualDisplayAdapter(
                     PixelFormat.TRANSPARENT
                 ).also {
                     it.gravity = Gravity.START or Gravity.TOP
-                    it.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    it.screenOrientation = if (width > height) {
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    } else {
+                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    }
                     it.alpha = 0f
                     it.width = 0
                     it.height = 0

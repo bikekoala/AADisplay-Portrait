@@ -14,8 +14,8 @@ android {
         applicationId = "io.github.nitsuya.aa.display"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2000
-        versionName = "0.20#15.1+"
+        versionCode = 3000  // 设置一个很大的版本号，避免 LSPosed 提示更新
+        versionName = "0.21#15.1+portrait"
         buildConfigField("long", "BUILD_TIME", buildTime.toString())
     }
 
@@ -65,6 +65,16 @@ android {
         }
 
     }
+    
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val versionName = variant.versionName.replace("#", "-")
+            output.outputFileName = "aa-display-${versionName}.apk"
+        }
+    }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

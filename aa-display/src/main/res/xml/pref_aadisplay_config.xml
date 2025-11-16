@@ -75,14 +75,14 @@
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 
-        <EditTextPreference
+<!--        <EditTextPreference
             android:inputType="text"
             app:singleLineTitle="true"
             app:defaultValue="am start com.miui.voiceassist/com.xiaomi.voiceassistant.CTAAlertActivity"
             app:key="VoiceAssistShell"
             app:title="语音助手Shell"
             app:useSimpleSummaryProvider="true"
-            app:iconSpaceReserved="false"/>
+            app:iconSpaceReserved="false"/>-->
 
     </PreferenceCategory>
 

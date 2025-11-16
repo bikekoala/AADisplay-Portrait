@@ -211,26 +211,6 @@ object AaUiHook: AaHook() {
                 resIdLauncherAndDashboardIconContainerId
             )
             val bottomIds = arrayListOf(
-                createBtn(R.drawable.ic_aa_filter_none_44){
-                    val intentClick = Intent().apply {
-                        action = AABroadcastConst.ACTION_SCREEN_CONTROL
-                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_DEMO_APP_1)
-                    }
-                    setOnClickListener {
-                        ctx.sendBroadcast(intentClick)
-                    }
-                    setPadding(0, 5, 0, 2)
-                },
-                createBtn(R.drawable.ic_aa_arrow_back_44){
-                    val intentClick = Intent().apply {
-                        action = AABroadcastConst.ACTION_SCREEN_CONTROL
-                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_BACK)
-                    }
-                    setOnClickListener {
-                        ctx.sendBroadcast(intentClick)
-                    }
-                    setPadding(0, 5, 0, 5)
-                },
                 createBtn(R.drawable.ic_aa_home_44){
                     val intentClick = Intent().apply {
                         action = AABroadcastConst.ACTION_SCREEN_CONTROL
@@ -251,30 +231,51 @@ object AaUiHook: AaHook() {
                     }
                     setPadding(0, 5, 0, 5)
                 },
-                createBtn(R.drawable.ic_aa_phone_44){
+                createBtn(R.drawable.ic_aa_arrow_back_44){
                     val intentClick = Intent().apply {
                         action = AABroadcastConst.ACTION_SCREEN_CONTROL
-                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_FEATURED_APP_1)
+                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_BACK)
                     }
                     setOnClickListener {
                         ctx.sendBroadcast(intentClick)
                     }
-                    setPadding(0, 5, 0, 10)
-                },
-                resultViewGroup.findViewById<View>(resIdAssistantIconId).run {
-                    if(!enableDefVoiceAssist){
-                        val intentClick = Intent().apply {
-                            action = AABroadcastConst.ACTION_SCREEN_CONTROL
-                            putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_SEARCH)
-                        }
-                        setOnClickFinallyListener {
-                            ctx.sendBroadcast(intentClick)
-                        }
-                    }
-                    resIdAssistantIconContainerId
+                    setPadding(0, 5, 0, 5)
                 },
             )
-            arrayListOf(resIdStatusBarId, resIdLauncherAndDashboardIconContainerId, resIdAssistantIconContainerId).forEach { vId ->
+//                createBtn(R.drawable.ic_aa_filter_none_44){
+//                    val intentClick = Intent().apply {
+//                        action = AABroadcastConst.ACTION_SCREEN_CONTROL
+//                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_DEMO_APP_1)
+//                    }
+//                    setOnClickListener {
+//                        ctx.sendBroadcast(intentClick)
+//                    }
+//                    setPadding(0, 5, 0, 2)
+//                },
+//                createBtn(R.drawable.ic_aa_phone_44){
+//                    val intentClick = Intent().apply {
+//                        action = AABroadcastConst.ACTION_SCREEN_CONTROL
+//                        putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_FEATURED_APP_1)
+//                    }
+//                    setOnClickListener {
+//                        ctx.sendBroadcast(intentClick)
+//                    }
+//                    setPadding(0, 5, 0, 10)
+//                },
+//                resultViewGroup.findViewById<View>(resIdAssistantIconId).run {
+//                    if(!enableDefVoiceAssist){
+//                        val intentClick = Intent().apply {
+//                            action = AABroadcastConst.ACTION_SCREEN_CONTROL
+//                            putExtra(AABroadcastConst.EXTRA_ACTION, KeyEvent.KEYCODE_SEARCH)
+//                        }
+//                        setOnClickFinallyListener {
+//                            ctx.sendBroadcast(intentClick)
+//                        }
+//                    }
+//                    resIdAssistantIconContainerId
+//                },
+//          arrayListOf(resIdStatusBarId, resIdLauncherAndDashboardIconContainerId, resIdAssistantIconContainerId).forEach { vId ->
+            arrayListOf(resIdStatusBarId, resIdLauncherAndDashboardIconContainerId).forEach { vId ->
                 val view = resultViewGroup.findViewById<View>(vId)
                 (view.parent as ViewGroup?)?.apply {
                     removeView(view)
