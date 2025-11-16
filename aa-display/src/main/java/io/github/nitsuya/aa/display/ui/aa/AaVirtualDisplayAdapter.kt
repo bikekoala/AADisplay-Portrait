@@ -41,15 +41,24 @@ class AaVirtualDisplayAdapter(
     companion object {
         const val TAG = "AADisplay_AaVirtualDisplayAdapter"
 
+        /** Package names to ignore in recent task list */
         private val IGNORE_RECENT_PACKAGE = setOf(
             BuildConfig.APPLICATION_ID,
-            "com.miui.home",
-            "com.google.android.apps.nexuslauncher",
+            "com.android.launcher3"
         )
     }
 
+    /** Default launch package name: the app package to launch when virtual display is created, can be null */
     private var mLauncherPackage = AADisplayConfig.LauncherPackage.get(CoreManagerService.config)
-    private var mLauncherTaskId: Int? = null
+    
+    /** Home package name: the app package to launch when Home key is pressed */
+    private var mHomePackage = AADisplayConfig.HomePackage.get(CoreManagerService.config)
+    
+    /** Task ID of the Home package */
+    private var mHomeTaskId: Int? = null
+    
+    /** Task ID of the default launch package */
+    private var mLauncherPackageTaskId: Int? = null
     private val mTaskStackListener = TaskStackListener()
     var mDisplayId = Display.INVALID_DISPLAY
     var mDensityDpi: Int = 0
@@ -151,13 +160,22 @@ class AaVirtualDisplayAdapter(
             )
         }
         Instances.iActivityTaskManager.registerTaskStackListener(mTaskStackListener)
-        startLauncher()
+        // When virtual display is created, launch default package first (if configured)
+        if(mLauncherPackage != null) {
+            startDefaultPackage()
+        } else {
+            // If no default package is configured, launch Home package as fallback
+            startHomeLauncher()
+        }
         onVirtualDisplayCreated(mDisplayId)
     }
 
     fun onReconnected(width: Int, height: Int, densityDpi: Int){
         mVirtualDisplay.resize(width, height, densityDpi)
         mDensityDpi = densityDpi
+        // Reload configuration
+        mLauncherPackage = AADisplayConfig.LauncherPackage.get(CoreManagerService.config)
+        mHomePackage = AADisplayConfig.HomePackage.get(CoreManagerService.config)
     }
 
     fun onDestroy() {
@@ -247,10 +265,35 @@ class AaVirtualDisplayAdapter(
         }
     }
 
+    /**
+     * Launch the app corresponding to Home key (usually the launcher)
+     * Called when user presses Home key
+     */
     fun startLauncher(){
+        startHomeLauncher()
+    }
+
+    /**
+     * Launch the app corresponding to Home package name
+     * If the app is already running, bring it to front; otherwise start a new instance
+     */
+    private fun startHomeLauncher(){
+        if(mHomePackage == null) return
+        if(mHomeTaskId != null){
+            moveTaskToFront(mHomeTaskId!!)
+        } else {
+            startActivity(mHomePackage!!, 0)
+        }
+    }
+
+    /**
+     * Launch the app corresponding to default launch package name
+     * Called when virtual display is created. If the app is already running, bring it to front; otherwise start a new instance
+     */
+    private fun startDefaultPackage(){
         if(mLauncherPackage == null) return
-        if(mLauncherTaskId != null){
-            moveTaskToFront(mLauncherTaskId!!)
+        if(mLauncherPackageTaskId != null){
+            moveTaskToFront(mLauncherPackageTaskId!!)
         } else {
             startActivity(mLauncherPackage!!, 0)
         }
@@ -346,6 +389,10 @@ class AaVirtualDisplayAdapter(
         }
     }
 
+    /**
+     * Move the second task to front
+     * If the second task is the Home package app, move the third task to front instead
+     */
     fun moveSecondTaskToFront(){
         if(mDisplayId == Display.INVALID_DISPLAY)
             return
@@ -354,7 +401,7 @@ class AaVirtualDisplayAdapter(
             return
         }
         moveTaskToFront(
-            if(allRootTaskInfosOnDisplay.size == 2 || allRootTaskInfosOnDisplay[1].topActivity!!.packageName != mLauncherPackage){
+            if(allRootTaskInfosOnDisplay.size == 2 || allRootTaskInfosOnDisplay[1].topActivity!!.packageName != mHomePackage){
                 allRootTaskInfosOnDisplay[1].taskId
             } else {
                 allRootTaskInfosOnDisplay[2].taskId
@@ -367,13 +414,18 @@ class AaVirtualDisplayAdapter(
         Instances.iInputManager.injectInputEvent(event, 0)
     }
 
+    /**
+     * Get recent task list for the specified display
+     * Filter out ignored package names and Home package app
+     */
     private fun recentTaskInfo(displayId: Int): List<RecentTaskInfo> {
         val allRootTaskInfosOnDisplay = Instances.iActivityTaskManager.getAllRootTaskInfosOnDisplay(displayId)
         log(TAG, "RecentTask $displayId, ${allRootTaskInfosOnDisplay.size}")
         return allRootTaskInfosOnDisplay
             .map { taskInfo ->
                 val topActivity = taskInfo.topActivity ?: return@map null
-                if(IGNORE_RECENT_PACKAGE.contains(topActivity.packageName) || mLauncherPackage == topActivity.packageName) {
+                // Filter out ignored package names and Home package
+                if(IGNORE_RECENT_PACKAGE.contains(topActivity.packageName) || mHomePackage == topActivity.packageName) {
                     return@map null
                 }
 
@@ -438,14 +490,30 @@ class AaVirtualDisplayAdapter(
         override fun onActivityDismissingDockedTask() {}
         override fun onActivityLaunchOnSecondaryDisplayFailed(taskInfo: ActivityManager.RunningTaskInfo?, requestedDisplayId: Int) {}
         override fun onActivityLaunchOnSecondaryDisplayRerouted(taskInfo: ActivityManager.RunningTaskInfo?, requestedDisplayId: Int) {}
+        /**
+         * Called when a new task is created
+         * Record task IDs for Home package and default launch package
+         */
         override fun onTaskCreated(taskId: Int, componentName: ComponentName?) {
-            if(componentName?.packageName != mLauncherPackage) return
-            mLauncherTaskId = taskId
+            val packageName = componentName?.packageName ?: return
+            if(packageName == mHomePackage) {
+                mHomeTaskId = taskId
+            } else if(packageName == mLauncherPackage) {
+                mLauncherPackageTaskId = taskId
+            }
         }
+        
+        /**
+         * Called when a task is removed
+         * If the removed task is the Home package, restart it
+         */
         override fun onTaskRemoved(taskId: Int) {
-            if(mLauncherTaskId != taskId) return
-            mLauncherTaskId = null
-            startLauncher()
+            if(mHomeTaskId == taskId) {
+                mHomeTaskId = null
+                startHomeLauncher()
+            } else if(mLauncherPackageTaskId == taskId) {
+                mLauncherPackageTaskId = null
+            }
         }
         override fun onTaskMovedToFront(taskInfo: ActivityManager.RunningTaskInfo) {}
         override fun onTaskDescriptionChanged(taskInfo: ActivityManager.RunningTaskInfo) {}

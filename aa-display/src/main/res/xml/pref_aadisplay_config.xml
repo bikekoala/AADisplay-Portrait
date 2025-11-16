@@ -4,22 +4,33 @@
 
     <PreferenceCategory
         app:key="CategoryBase"
-        app:title="基础配置"
+        app:title="Basic Settings"
         app:iconSpaceReserved="false">
 
         <rikka.material.preference.MaterialSwitchPreference
             app:defaultValue="true"
             app:key="AutoOpen"
-            app:title="自动打开"
-            app:summary="连接Android Auto后自动打开应用"
+            app:title="Auto Open"
+            app:summary="Automatically open app when Android Auto is connected"
             app:iconSpaceReserved="false"/>
 
         <EditTextPreference
             android:inputType="text"
             app:singleLineTitle="true"
-            app:defaultValue="com.wow.carlauncher.mini"
+            app:defaultValue="com.autonavi.amapauto"
             app:key="LauncherPackage"
-            app:title="首选项包名"
+            app:title="Default Launch Package"
+            app:summary="Package name of the app to launch when virtual display is created, can be empty"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+
+        <EditTextPreference
+            android:inputType="text"
+            app:singleLineTitle="true"
+            app:defaultValue="com.ss.squarehome2"
+            app:key="HomePackage"
+            app:title="Home Package"
+            app:summary="Package name of the app to launch when Home key is pressed"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 
@@ -41,28 +52,28 @@
             android:inputType="number"
             app:defaultValue="180"
             app:key="DelayDestroyTime"
-            app:title="延迟销毁时间"
+            app:title="Delay Destroy Time"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
 
         <rikka.material.preference.MaterialSwitchPreference
             app:defaultValue="false"
             app:key="ScreenOffReplaceLockScreen"
-            app:title="仅熄屏"
-            app:summary="电源键替换仅熄屏"
+            app:title="Screen Off Only"
+            app:summary="Power key only turns off screen"
             app:iconSpaceReserved="false"/>
 
         <rikka.material.preference.MaterialSwitchPreference
             app:defaultValue="true"
             app:key="CloseLauncherDashboard"
-            app:title="阻止AA分屏切换"
+            app:title="Block AA Split Screen"
             app:summary=""
             app:iconSpaceReserved="false"/>
 
         <rikka.material.preference.MaterialSwitchPreference
             app:defaultValue="true"
             app:key="ForceRightAngle"
-            app:title="强制直角"
+            app:title="Force Right Angle"
             app:summary=""
             app:iconSpaceReserved="false"/>
 
@@ -88,20 +99,20 @@
 
     <PreferenceCategory
         app:key="CategoryShell"
-        app:title="Shell命令"
+        app:title="Shell Commands"
         app:iconSpaceReserved="false">
 
         <EditTextPreference
             android:inputType="textMultiLine"
             app:key="CreateVirtualDisplayBefore"
-            app:title="创建虚拟屏前执行"
+            app:title="Execute Before Creating Virtual Display"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 
         <EditTextPreference
             android:inputType="textMultiLine"
             app:key="DestroyVirtualDisplayAfter"
-            app:title="销毁虚拟屏后执行"
+            app:title="Execute After Destroying Virtual Display"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
 
@@ -109,14 +120,14 @@
 
     <PreferenceCategory
         app:key="CategoryPhysicalBtn"
-        app:title="实体按钮"
+        app:title="Physical Buttons"
         app:summary="TODO"
         app:iconSpaceReserved="false">
     </PreferenceCategory>
 
     <PreferenceCategory
         app:key="CategoryAndroidAuto"
-        app:title="AndroidAuto配置"
+        app:title="Android Auto Settings"
         app:summary="[com.google.android."
         app:singleLineTitle="true"
         app:iconSpaceReserved="false">
