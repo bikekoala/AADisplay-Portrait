@@ -57,7 +57,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // 如果环境变量存在且签名配置有效，使用 release 签名，否则使用默认调试签名
+            if (System.getenv("KEY_ANDROID") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
 //            proguardFiles(
 //                getDefaultProguardFile("proguard-android-optimize.txt"),
 //                "proguard-rules.pro"
